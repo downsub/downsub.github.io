@@ -1,0 +1,405 @@
+<html>
+  <head>
+    <meta charset='utf-8'/>
+    <link rel="preconnect" href="https://fonts.gstatic.com"/>
+    <title>Download captions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet"/>
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        font-size: 30pt;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        height: 100%;
+        margin: 0;
+        transition: background-color 0.3s ease;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      main {
+        display: grid;
+        height: 100%;
+        place-items: center;
+        text-align: center;
+      }
+
+      body.start {
+        background-color: #eee;
+      }
+      body.choose-lang {
+        background-color: #aea;
+      }
+
+      form {
+        color: #555;
+        cursor: default;
+        letter-spacing: 0.01em;
+        padding-top: 2ex;
+        padding-bottom: 2ex;
+      }
+
+      form input {
+        font-size: 18pt;
+        padding: 1ex 0.5em;
+        margin: 0;
+        border-radius: 15px;
+        border-width: 1px;
+        border-color: #ccc;
+        border-style: solid;
+        color: #444;
+      }
+
+      form input[type="text"]:-webkit-autofill::first-line {
+        font-size: 18pt;
+      }
+
+      form input:focus,
+      form input:hover {
+        outline: none;
+        border-color: #000;
+      }
+
+      form input::placeholder {
+        color: #ddd;
+      }
+
+      form input[type="submit"] {
+        background-color: #7cf;
+        border-color: #88c;
+        color: #44a;
+        padding: 1ex 1.25em;
+      }
+
+      form input[type="submit"]:focus,
+      form input[type="submit"]:hover {
+        border-color: #228;
+      }
+
+      form input[type="submit"]:focus {
+        background-color: #6be;
+      }
+
+      footer {
+        font-size: 18pt;
+      }
+
+      .choose-lang .start-only {
+        display: none;
+      }
+
+      ul {
+        display: grid;
+        font-size: 25pt;
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        display: grid;
+        grid-template-columns: 6em auto minmax(0, 4em);
+        padding: 1ex 0.5em;
+        cursor: pointer;
+        transition: background-color 0.1s ease;
+      }
+      .choose-lang li div[data-field="lang_code"] {
+        color: #6a6;
+      }
+      .choose-lang li:hover {
+        background: #cfc;
+      }
+
+      ul .template {
+        display: none;
+      }
+
+      footer {
+        font-size: 16pt;
+        text-align: center;
+      }
+
+      footer a {
+        color: #888;
+      }
+
+      .options {
+        display: inline-flex;
+        margin: 1ex 0.5em;
+        font-size: 18pt;
+      }
+      .options label {
+        padding: 1ex 0.5em;
+        color: #888;
+        background-color: #fff;
+      }
+      .options input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .options input + label {
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+      .options input:first-child + label {
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
+        border-left: 1px solid #ccc;
+        padding-left: 0.75em;
+      }
+      .options input + label:last-child {
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+        border-right: 1px solid #ccc;
+        padding-right: 0.75em;
+      }
+      .options input:checked + label {
+        background-color: #aaa;
+        color: #fff;
+      }
+      .options input:checked + label,
+      .options input:checked:first-child + label,
+      .options input:checked + label:last-child {
+        border-color: #888;
+      }
+      .options:hover input + label,
+      .options:hover input:first-child + label,
+      .options:hover input + label:last-child {
+        border-color: #000;
+      }
+    </style>
+  </head>
+  <body class="start">
+    <header></header>
+    <main>
+      <form action="">
+        <label>
+          <p class="start-only">To download captions, enter a YouTube URL:</p>
+          <input type="text" placeholder="https://youtu.be/dQw4w9WgXcQ" name="url" size=45>
+        </label>
+        <input type="submit" value="Check">
+        <div>
+          <div class="options">
+            <input type="radio" name="format" value="srt" id="format-srt"><label for="format-srt">SRT</label>
+            <input type="radio" name="format" value="txt" id="format-txt"><label for="format-txt">TXT</label>
+            <input type="radio" name="format" value="vtt" id="format-vtt"><label for="format-vtt">VTT</label>
+            <input type="radio" name="format" value="ttml" id="format-ttml"><label for="format-ttml">TTML</label>
+            <!--<fieldset>
+            <legend>YouTube</legend>
+            <input type="radio" name="format" value="json3" id="format-json3"><label for="format-json3">JSON3</label>
+            <input type="radio" name="format" value="srv3" id="format-srv3"><label for="format-srv3">SRV3</label>
+            <input type="radio" name="format" value="srv2" id="format-srv2"><label for="format-srv2">SRV2</label>
+            <input type="radio" name="format" value="srv1" id="format-srv1"><label for="format-srv1">SRV1</label>
+            </fieldset>-->
+          </div>
+        </div>
+        <ul class="download-only">
+          <li class="template">
+            <div data-field="lang_code"></div>
+            <div data-field="lang_translated"></div>
+            <div data-field="name"></div>
+          </li>
+        </ul>
+      </form>
+    </main>
+    <footer>
+      <p class="start-only"><a href="asr/">Looking for auto-generated captions?</a></p>
+    </footer>
+    <script>
+      (() => {
+        const getId = (url) => {
+          const res = [
+            new RegExp('^https?://youtu\\.be/(?<id>[A-Za-z0-9_-]+)'),
+            new RegExp('^https?://(www\\.)?(youtube|googlevideo|youtube-nocookie)\\.com/(embed/|.*\\?v=|.*\\&v=)(?<id>[A-Za-z0-9_-]+)'),
+          ];
+          for (const re of res) {
+            const match = url.match(re);
+            if (match) return match.groups.id;
+          }
+        };
+        const getCaptionList = async (id) => {
+          const url = `https://www.youtube.com/api/timedtext?v=${id}&type=list`;
+          const resp = await fetch(url);
+          const xml = await resp.text();
+          const doc = new DOMParser().parseFromString(xml, 'application/xml');
+          const captions = [];
+          for (const track of doc.getElementsByTagName('track')) {
+            const lang_code = track.getAttribute('lang_code');
+            const name = track.getAttribute('name');
+            const lang_translated = track.getAttribute('lang_translated');
+            captions.push({lang_code, name, lang_translated});
+          }
+          return captions;
+        }
+        const clearUl = () => {
+          const ul = document.querySelector('ul');
+          for (const li of ul.querySelectorAll('li')) {
+            if (!li.classList.contains('template')) ul.removeChild(li);
+          }
+        };
+        const setState = (state) => {
+            document.body.classList.remove('start');
+            document.body.classList.remove('choose-lang');
+            document.body.classList.add(state);
+        }
+        const error = (msg) => {
+            clearUl();
+            setState('start');
+            setTimeout(() => alert(msg), 200);
+            throw msg;
+        };
+        const setUrlParams = (params) => {
+          const searchParams = new URL(document.location).searchParams;
+          for (const k in params) {
+            searchParams.set(k, params[k]);
+          }
+          history.pushState({}, '', '?' + searchParams);
+        };
+        const listCaptions = async () => {
+          const url = document.querySelector('input[name="url"]').value.trim();
+          if (!url) {
+            clearUl();
+            setState('start');
+            setUrlParams({url});
+            return;
+          };
+
+          const id = getId(url);
+          if (!id) error('Could not recognise this as a YouTube URL');
+          setUrlParams({url});
+          const captions = await getCaptionList(id);
+          if (!captions.length) error('Could not find any captions for this video');
+
+          clearUl();
+          setState('choose-lang');
+          const ul = document.querySelector('ul');
+          const template = ul.querySelector('li.template')
+          window.currentId = id;
+          for (const caption of captions) {
+            const li = template.cloneNode(true);
+            li.classList.remove('template');
+            for (const div of li.getElementsByTagName('div')) {
+              div.innerText = div.dataset.value = caption[div.dataset.field];
+            }
+            ul.appendChild(li);
+          }
+        };
+        document.querySelector('.options').addEventListener('click', ({target}) => {
+          if (!target.matches('input[name="format"]')) return;
+          const format = document.querySelector('input[name="format"]:checked').value;
+          setUrlParams({format});
+        });
+        document.querySelector('form').addEventListener('submit', (e) => {
+          listCaptions();
+          e.preventDefault();
+          return false;
+        });
+
+        const getCaptions = async (id, lang_code, name, format) => {
+          const url = `https://www.youtube.com/api/timedtext?v=${id}&name=${name}&lang=${lang_code}&fmt=${format}`;
+          const resp = await fetch(url);
+          return await resp.text();
+        };
+        const parseTtml = (ttml) => {
+            const doc = new DOMParser().parseFromString(ttml, 'application/xml');
+            const cues = [];
+            for (const cue of doc.querySelectorAll('tt > body > div > p')) {
+              const begin = cue.getAttribute('begin');
+              const end = cue.getAttribute('end');
+              let text = '';
+              for (const node of cue.childNodes) {
+                // TODO: spans? comments?
+                if (node.nodeName == '#text') {
+                  text += node.data;
+                } else if (node.nodeName == 'br') {
+                  text += '\n';
+                }
+              }
+              cues.push({begin, end, text});
+            }
+            return cues;
+        };
+        const ttmlToSrt = (ttml) => {
+            // TODO: inline formatting? regions? karaoke?
+            const cues = parseTtml(ttml);
+            const lines = [];
+            let n = 1;
+            /* Aegi parses '<b', '<i', etc as formatting, but doesn't escape when
+             * exporting, so as the next best option, let's follow WebVTT's lead:
+             * https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API#cue_payload */
+            const escapeFormatting = (str) => str.replace(/[&<>]/g,
+              tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+              }[tag]));
+            for (const cue of cues) {
+              const begin = cue.begin.replace('.', ',');
+              const end = cue.end.replace('.', ',');
+              /* \u{200b} is a placeholder to keep from breaking to the next cue */
+              const text = cue.text.replace('\n\n', '\n\u{200b}\n');
+              //lines.push(`${n}`);
+              lines.push(`${begin} --> ${end}`);
+              lines.push(`${escapeFormatting(text)}`);
+              lines.push(``);
+              n += 1;
+            }
+            return lines.join('\n');
+        }
+        const ttmlToTxt = (ttml) => {
+            const cues = parseTtml(ttml);
+            const lines = [];
+            for (const cue of cues) {
+              lines.push(cue.text);
+            }
+            return lines.join('\n');
+        }
+        const getCaptionsInFormat = async (id, lang_code, name, format) => {
+          if (format == 'srt') {
+            const captions = await getCaptions(id, lang_code, name, 'ttml');
+            return ttmlToSrt(captions);
+          } else if (format == 'txt') {
+            const captions = await getCaptions(id, lang_code, name, 'ttml');
+            return ttmlToTxt(captions);
+          }
+          return getCaptions(id, lang_code, name, format);
+        }
+        document.querySelector('ul').addEventListener('click', async ({target}) => {
+          const li = target.closest('li');
+          const lang_code = li.querySelector('[data-field="lang_code"]').dataset.value;
+          const name = li.querySelector('[data-field="name"]').dataset.value;
+          const format = document.querySelector('input[name="format"]:checked').value;
+          const id = window.currentId;
+          const captions = await getCaptionsInFormat(id, lang_code, name, format);
+          const blob = new Blob([captions], { type: 'application/octet-stream' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          if (name) {
+            a.download = `${id}.${name}.${format}`;
+          } else {
+            a.download = `${id}.${lang_code}.${format}`;
+          }
+          a.click();
+        });
+
+        document.querySelector('input[name="url"]').focus();
+        const searchParams = new URL(document.location).searchParams;
+        let format = searchParams.get('format');
+        if (!format) format = 'srt';
+        if (!format.match(/^[a-z0-9]+$/)) format = 'srt';
+        document.querySelector('input[name="format"][value="' + format + '"]').checked = true;
+        const url = searchParams.get('url');
+        if (url) {
+          document.querySelector('input[name="url"]').value = url;
+          listCaptions();
+        }
+      })();
+    </script>
+  </body>
+</html>
