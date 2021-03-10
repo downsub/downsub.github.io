@@ -71,7 +71,7 @@
       form input[type="submit"] {
         background-color: #7cf;
         border-color: #88c;
-        color: #44a;
+        color: #448;
         padding: 1ex 1.25em;
       }
 
@@ -89,7 +89,7 @@
       }
 
       .choose-lang .start-only {
-        display: none;
+        opacity: 0;
       }
 
       ul {
@@ -118,11 +118,18 @@
 
       footer {
         font-size: 16pt;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        color: #888;
+      }
+
+      footer p:nth-child(2) {
         text-align: center;
       }
 
-      footer a {
-        color: #888;
+      .report-bug {
+        margin-right: 1em;
+        text-align: right;
       }
 
       .options {
@@ -141,22 +148,23 @@
         height: 0;
       }
       .options input + label {
-        border-top: 1px solid #ccc;
-        border-bottom: 1px solid #ccc;
+        border: 1px solid;
+        border-top-color: #ccc;
+        border-bottom-color: #ccc;
+        border-left-color: transparent;
+        border-right-color: transparent;
         border-radius: 0;
-        border-left: none;
-        border-right: none;
       }
       .options input:first-child + label {
         border-top-left-radius: 15px;
         border-bottom-left-radius: 15px;
-        border-left: 1px solid #ccc;
+        border-left-color: #ccc;
         padding-left: 0.75em;
       }
       .options input + label:last-child {
         border-top-right-radius: 15px;
         border-bottom-right-radius: 15px;
-        border-right: 1px solid #ccc;
+        border-right-color: #ccc;
         padding-right: 0.75em;
       }
       .options input:checked + label {
@@ -168,10 +176,20 @@
       .options input:checked + label:last-child {
         border-color: #888;
       }
-      .options:hover input + label,
-      .options:hover input:first-child + label,
+      .options input:focus + label,
+      .options input:focus:first-child + label,
+      .options input:focus + label:last-child {
+        border-color: #444;
+      }
+      .options:hover input + label {
+        border-top-color: #000 !important;
+        border-bottom-color: #000 !important;
+      }
+      .options:hover input:first-child + label {
+        border-left-color: #000 !important;
+      }
       .options:hover input + label:last-child {
-        border-color: #000;
+        border-right-color: #000 !important;
       }
     </style>
   </head>
@@ -209,7 +227,9 @@
       </form>
     </main>
     <footer>
+      <p></p>
       <p class="start-only"><a href="asr/">Looking for auto-generated captions?</a></p>
+      <p class="report-bug"><a href="https://github.com/downsub/downsub.github.io/issues">Report a bug</a></p>
     </footer>
     <script>
       (() => {
