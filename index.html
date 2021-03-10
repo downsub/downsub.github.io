@@ -100,7 +100,7 @@
       }
       li {
         display: grid;
-        grid-template-columns: 6em auto minmax(0, 4em);
+        grid-template-columns: 6em auto minmax(0, 8em);
         padding: 1ex 0.5em;
         cursor: pointer;
         transition: background-color 0.1s ease;
@@ -151,35 +151,40 @@
         border: 1px solid;
         border-top-color: #ccc;
         border-bottom-color: #ccc;
-        border-left-color: transparent;
-        border-right-color: transparent;
         border-radius: 0;
+        border-left: none;
+        border-right: none;
       }
       .options input:first-child + label {
         border-top-left-radius: 15px;
         border-bottom-left-radius: 15px;
-        border-left-color: #ccc;
+        border-left: 1px solid #ccc;
         padding-left: 0.75em;
       }
       .options input + label:last-child {
         border-top-right-radius: 15px;
         border-bottom-right-radius: 15px;
-        border-right-color: #ccc;
+        border-right: 1px solid #ccc;
         padding-right: 0.75em;
       }
       .options input:checked + label {
         background-color: #aaa;
         color: #fff;
       }
-      .options input:checked + label,
-      .options input:checked:first-child + label,
-      .options input:checked + label:last-child {
+      .options input:checked + label {
         border-color: #888;
       }
-      .options input:focus + label,
-      .options input:focus:first-child + label,
-      .options input:focus + label:last-child {
+      .options input:focus + label {
         border-color: #444;
+        border-left: 1px solid #444;
+        margin-left: -1;
+      }
+      .options input:focus:first-child + label {
+        margin-left: 0;
+      }
+      .options input:focus + label + input + label {
+        border-left: 1px solid #444;
+        margin-left: -1
       }
       .options:hover input + label {
         border-top-color: #000 !important;
