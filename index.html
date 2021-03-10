@@ -331,21 +331,27 @@
           const resp = await fetch(url);
           return await resp.text();
         };
+        const getTtmlText = (parent) => {
+          let text = '';
+          for (const node of parent.childNodes) {
+            // TODO: styles? deduping of shadows? comments?
+            if (node.nodeName == '#text') {
+              text += node.data;
+            } else if (node.nodeName == 'br') {
+              text += '\n';
+            } else if (node.nodeName == 'span') {
+              text += getTtmlText(node);
+            }
+          }
+          return text;
+        }
         const parseTtml = (ttml) => {
             const doc = new DOMParser().parseFromString(ttml, 'application/xml');
             const cues = [];
             for (const cue of doc.querySelectorAll('tt > body > div > p')) {
               const begin = cue.getAttribute('begin');
               const end = cue.getAttribute('end');
-              let text = '';
-              for (const node of cue.childNodes) {
-                // TODO: spans? comments?
-                if (node.nodeName == '#text') {
-                  text += node.data;
-                } else if (node.nodeName == 'br') {
-                  text += '\n';
-                }
-              }
+              const text = getTtmlText(cue);
               cues.push({begin, end, text});
             }
             return cues;
