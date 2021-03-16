@@ -2,15 +2,19 @@
   <head>
     <meta charset='utf-8'/>
     <link rel="preconnect" href="https://fonts.gstatic.com"/>
+    <link rel="preconnect" href="https://www.youtube.com"/>
     <title>Download captions</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet"/>
     <style>
+      html {
+        overflow-y: scroll;
+      }
+
       body {
         font-family: 'Roboto', sans-serif;
         font-size: 30pt;
         display: grid;
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: 2ex 1fr auto;
         height: 100%;
         margin: 0;
         transition: background-color 0.3s ease;
@@ -32,6 +36,7 @@
         background-color: #eee;
       }
       body.choose-lang {
+        document.querySelector('.player').classList.add('not-ready');
         background-color: #aea;
       }
 
@@ -88,6 +93,114 @@
         font-size: 18pt;
       }
 
+      form {
+        margin-top: -6ex;
+      }
+      .choose-lang .start-only {
+        opacity: 0;
+      }
+      .start .choose-lang-only {
+        opacity: 0;
+      }
+
+      ul {
+        display: grid;
+        font-size: 25pt;
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        display: grid;
+        grid-template-columns: 6em auto minmax(0, 8em);
+        padding: 1ex 0.5em;
+        cursor: pointer;
+        transition: background-color 0.1s ease;
+      }
+      .choose-lang li div[data-field="lang_code"] {
+        color: #6a6;
+      }
+      .choose-lang li:hover {
+        background: #cfc;
+      }
+
+      ul .template {
+        display: none;
+      }
+
+      footer {
+        font-size: 16pt;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        color: #888;
+      }
+      .choose-lang .start-only {
+        opacity: 0;
+      }
+
+      ul {
+        display: grid;
+        font-size: 25pt;
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        display: grid;
+        grid-template-columns: 6em auto minmax(0, 8em);
+        padding: 1ex 0.5em;
+        cursor: pointer;
+        transition: background-color 0.1s ease;
+      }
+      .choose-lang li div[data-field="lang_code"] {
+        color: #6a6;
+      }
+      .choose-lang li:hover {
+        background: #cfc;
+      }
+
+      ul .template {
+        display: none;
+      }
+
+      footer {
+        font-size: 16pt;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        color: #888;
+      }
+      .choose-lang .start-only {
+        opacity: 0;
+      }
+
+      ul {
+        display: grid;
+        font-size: 25pt;
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        display: grid;
+        grid-template-columns: 6em auto minmax(0, 8em);
+        padding: 1ex 0.5em;
+        cursor: pointer;
+        transition: background-color 0.1s ease;
+      }
+      .choose-lang li div[data-field="lang_code"] {
+        color: #6a6;
+      }
+      .choose-lang li:hover {
+        background: #cfc;
+      }
+
+      ul .template {
+        display: none;
+      }
+
+      footer {
+        font-size: 16pt;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        color: #888;
+      }
       .choose-lang .start-only {
         opacity: 0;
       }
@@ -196,11 +309,51 @@
       .options:hover input + label:last-child {
         border-right-color: #000 !important;
       }
+
+      .not-ready iframe {
+        display: none;
+      }
+
+      .player {
+        display: grid;
+        place-items: center;
+      }
+
+      .player iframe {
+        grid-area: 1 / 1 / 1 / 1;
+      }
+
+      .player #thumbnail {
+        width: 400px;
+        height: 225px;
+        background-repeat: no-repeat;
+        background-size: cover;
+        /* 4:3 thumbnails will be cropped */
+        background-position: center;
+        opacity: 1;
+        pointer-events: none;
+        grid-area: 1 / 1 / 1 / 1;
+        transition: opacity 0.5s ease;
+        z-index: 0;
+      }
+
+      .player.ready:hover #thumbnail,
+      .player.ready.playing #thumbnail {
+        opacity: 0;
+      }
+
     </style>
   </head>
   <body class="start">
     <header></header>
     <main>
+      <div class="choose-lang-only player not-ready">
+        <div id="player"></div>
+        <div id="thumbnail"></div>
+        <div class="controls">
+          <!--<input type="range" min="1" max="100" value="1" class="slider">-->
+        </div>
+      </div>
       <form action="">
         <label>
           <p class="start-only">To download captions, enter a YouTube URL:</p>
@@ -305,7 +458,9 @@
           setState('choose-lang');
           const ul = document.querySelector('ul');
           const template = ul.querySelector('li.template')
-          window.currentId = id;
+          window.currentYoutubeId = id;
+          document.querySelector('#thumbnail').style.backgroundImage = `url(https://img.youtube.com/vi/${id}/maxresdefault.jpg),url(https://img.youtube.com/vi/${id}/hqdefault.jpg)`;
+          loadVideo(id);
           for (const caption of captions) {
             const li = template.cloneNode(true);
             li.classList.remove('template');
@@ -406,15 +561,21 @@
           const lang_code = li.querySelector('[data-field="lang_code"]').dataset.value;
           const name = li.querySelector('[data-field="name"]').dataset.value;
           const format = document.querySelector('input[name="format"]:checked').value;
-          const id = window.currentId;
+          const id = window.currentYoutubeId;
           const captions = await getCaptionsInFormat(id, lang_code, name, format);
           const blob = new Blob([captions], { type: 'application/octet-stream' });
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
+          let title;
+          if (document.querySelector('.player').classList.contains('ready')) {
+            /* The browser should deal with invalid characters */
+            title = ytPlayer.player.getVideoData().title;
+          }
+          if (!title) title = id;
           if (name) {
-            a.download = `${id}.${name}.${format}`;
+            a.download = `${title}.${name}.${format}`;
           } else {
-            a.download = `${id}.${lang_code}.${format}`;
+            a.download = `${title}.${lang_code}.${format}`;
           }
           a.click();
         });
@@ -431,6 +592,200 @@
           listCaptions();
         }
       })();
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const loadVideo = async (id) => {
+        document.querySelector('.player').classList.remove('ready');
+        document.querySelector('.player').classList.add('not-ready');
+
+        await ytPlayer.load(id);
+        if (false) {
+          // Duration is only populated when we try to play
+          await ytPlayer.play();
+          await ytPlayer.pause();
+          console.log(ytPlayer.player.getDuration());
+        }
+        ytPlayer.player.addEventListener('onStateChange', ({data}) => {
+          document.querySelector('.player').classList.toggle('playing', data == YT.PlayerState.PLAYING);
+        });
+        document.querySelector('.player').classList.remove('not-ready');
+        document.querySelector('.player').classList.add('ready');
+      };
+
+      class YtPlayerStateWaiter extends Promise {
+        constructor(player, state) {
+          let handlers;
+          super((resolve, reject) => handlers = {resolve, reject});
+          this._handlers = handlers;
+          this._state = state;
+          player.stateWaiters[state].push(new WeakRef(this));
+        }
+        static resolveAll(player, state, data) {
+          for (const ref of player.stateWaiters[state]) {
+            const waiter = ref.deref();
+            if (waiter) waiter._handlers.resolve(data);
+          }
+        }
+        static rejectAll(player, state, data) {
+          for (const ref of player.stateWaiters[state]) {
+            const waiter = ref.deref();
+            if (waiter) waiter._handlers.reject(new Error(`Player error: ${data}`));
+          }
+        }
+        static [Symbol.species] = Promise;
+        [Symbol.toStringTag] = 'YtPlayerStateWaiter';
+      }
+      window.YtPlayerStateWaiter = YtPlayerStateWaiter;
+
+      class YtPlayer {
+        static apiReady = new Promise((resolve) => YtPlayer._apiReadyResolve = resolve);
+
+        constructor(objectId) {
+          this.objectId = objectId;
+          this.stateWaiters = {};
+          this.playerReady = new Promise((resolve) => {
+            this._resolvePlayerReady = resolve;
+          });
+        }
+
+        async create() {
+           /* The player doesn't fetch video data when using videoId until play is called.
+           * It does include the title, but not author, if used to create the iframe.
+           * However, it fetches video data when using a playlist (which can be a videoId).
+           * You can see this in effect by checking whether the title or author appears.
+           * Calling playVideo on a player without a videoId will throw error 2.
+           * This includes if you cuePlaylist and the video data hasn't been fetched yet.
+           * await player.cued() after cueing a playlist to fix this. */
+          await YtPlayer.apiReady;
+          await this.createIframe();
+        }
+
+        createIframe() {
+          if (this.player) return this.playerReady;
+          /* A race setting the origin sometimes results in a postMessage error,
+           * regardless of when we create it. Seems YT relies on setTimeout.*/
+          /* https://earth.stanford.edu/ has embedOptOutDeprecation in ytcfg,
+           * which is how they get .ytp-hide-info-bar (showinfo=0). As a workaround,
+           * we overlay the thumbnail while the video is paused. If we want to wait
+           * until the chrome's disappeared, await sleep(3000) after first play. */
+          this.player = new YT.Player(this.objectId, {
+            width: 400,
+            height: 225,
+            playerVars: {
+              mute: 1,
+              controls: 0,        /* hides channel branding */
+              disablekb: 1,       /* no keyboard control */
+              fs: 0,              /* no full-screen as there are no controls */
+              modestbranding: 1,  /* doesn't seem to do anything */
+              playsinline: 1,     /* only affects iOS */
+              rel: 0,             /* only show channel videos at end */
+              loop: 1,            /* only works with playlist */
+              cc_load_policy: 3,  /* undocumented, disables captions */
+            },
+          });
+          this.createListeners();
+          return this.playerReady;
+        }
+
+        async load(videoId) {
+          /* "Cue" a video. This replaces the current video. */
+          await this.playerReady;
+          /* We use a playlist to make loop work */
+          await this.player.cuePlaylist(videoId);
+          await this.cued();
+        }
+
+        async play() {
+          /* Only errors will stop the video playing */
+          // FIXME: reject if load() is called
+          const state = this.player.getPlayerState();
+          if (state == YT.PlayerState.PLAYING) return;
+          this.player.playVideo();
+          await this.playing();
+        }
+
+        async pause() {
+          const state = this.player.getPlayerState();
+          if (state == YT.PlayerState.PAUSED || state == YT.PlayerState.CUED) return;
+          if (state != YT.PlayerState.PLAYING && state != YT.PlayerState.BUFFERING) return Promise.reject(new Error(`Cannot pause`));
+          this.player.pauseVideo();
+          await this.paused();
+        }
+
+        async livePause() {
+          // Looks great, but pegs the CPU
+          player.pauseTime = ytPlayer.player.getCurrentTime();
+          await ytPlayer.play();
+          player.pauseInterval = setInterval(() => ytPlayer.player.seekTo(player.pauseTime), 1000);
+        }
+
+        async mute() { this.player.mute(); }
+        async unmute() { this.player.unmute(); }
+
+        get iframe() {
+          return this.player.getIframe();
+        }
+
+        createListeners() {
+          for (const state in YtPlayer.playStates) {
+            this.stateWaiters[state] = [];
+          }
+
+          /* One listener, to avoid races. We don't get subsequent events
+           * if this doesn't return in time, so also defer it with a timer. */
+          this.player.addEventListener('onStateChange', ({data}) => {
+            console.log(`YtPlayer.onStateChange: ${data}`);
+            setTimeout(() => {
+              for (const state in YtPlayer.playStates) {
+                if (data == YtPlayer.playStates[state]) {
+                  YtPlayerStateWaiter.resolveAll(this, state, data);
+                }
+              }
+              // TODO: reject playing if cued or ended (or unstarted?)
+            }, 0);
+          });
+
+          this.player.addEventListener('onError', ({data}) => {
+            console.log(`YtPlayer.onError: ${data}`);
+            setTimeout(() => {
+              // TODO: check if it affects cued too
+              for (const state of ['playing', 'paused', 'buffering']) {
+                YtPlayerStateWaiter.rejectAll(this, state, data);
+              }
+            }, 0);
+          });
+          this.pausedOrBuffering = () => Promise.race([this.paused(), this.buffering()]);
+          for (const state in YtPlayer.playStates) {
+            this[state] = () => new YtPlayerStateWaiter(this, state);
+          }
+          /* Only fires once, can't fail */
+          this.player.addEventListener('onReady', this._resolvePlayerReady);
+        }
+        [Symbol.toStringTag] = 'YtPlayer';
+      }
+      window.onYouTubeIframeAPIReady = () => {
+        YtPlayer.playStates = {
+          'unstarted': -1,
+          'ended': YT.PlayerState.ENDED,
+          'playing': YT.PlayerState.PLAYING,
+          'paused': YT.PlayerState.PAUSED,
+          'buffering': YT.PlayerState.BUFFERING,
+          'cued': YT.PlayerState.CUED,
+        }
+        YtPlayer._apiReadyResolve();
+      };
+      window.YtPlayer = YtPlayer;
+      window.ytPlayer = new YtPlayer('player');
+      window.ytPlayer.create();
+
+      /*
+      player.addEventListener('onPlaybackRateChange', ({data}) => {
+        console.log(`onPlaybackRateChange: ${data}`);
+      });
+      player.addEventListener('onApiChange', ({data}) => {
+        console.log(`onApiChange: ${data}`);
+      });
+      */
     </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
   </body>
 </html>
