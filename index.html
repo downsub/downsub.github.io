@@ -94,6 +94,7 @@
       }
 
       form {
+        /* FIXME: this is nasty, covers the video, and leaves the starting form too low */
         margin-top: -6ex;
       }
       .choose-lang .start-only {
@@ -459,7 +460,8 @@
           const ul = document.querySelector('ul');
           const template = ul.querySelector('li.template')
           window.currentYoutubeId = id;
-          document.querySelector('#thumbnail').style.backgroundImage = `url(https://img.youtube.com/vi/${id}/maxresdefault.jpg),url(https://img.youtube.com/vi/${id}/hqdefault.jpg)`;
+
+          loadThumbnail(id);
           loadVideo(id);
           for (const caption of captions) {
             const li = template.cloneNode(true);
@@ -592,7 +594,22 @@
           listCaptions();
         }
       })();
+
       const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const loadThumbnail = async (id) => {
+        const img = new Image();
+        img.src = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+        await img.decode();
+        if (window.currentYoutubeId != id) return;
+        if (img.width == 120) {
+          /* We got a 404, use the guaranteed thumbnail instead */
+          document.querySelector('#thumbnail').style.backgroundImage = `url(https://img.youtube.com/vi/${id}/hqdefault.jpg)`;
+        } else {
+          document.querySelector('#thumbnail').style.backgroundImage = `url(${img.src})`;
+        }
+      };
+
       const loadVideo = async (id) => {
         document.querySelector('.player').classList.remove('ready');
         document.querySelector('.player').classList.add('not-ready');
