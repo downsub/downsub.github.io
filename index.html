@@ -534,7 +534,10 @@
               const text = cue.text.replace('\n\n', '\n\u{200b}\n');
               lines.push(`${n}`);
               lines.push(`${begin} --> ${end}`);
-              lines.push(`${escapeFormatting(text)}`);
+              /* To ensure round-tripping and to match other download sites,
+               * we don't perform escaping. Treat Aegi as buggy here. */
+              //lines.push(`${escapeFormatting(text)}`);
+              lines.push(`${text}`);
               lines.push(``);
               n += 1;
             }
