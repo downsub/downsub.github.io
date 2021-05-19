@@ -532,7 +532,7 @@
               const end = cue.end.replace('.', ',');
               /* \u{200b} is a placeholder to keep from breaking to the next cue */
               const text = cue.text.replace('\n\n', '\n\u{200b}\n');
-              //lines.push(`${n}`);
+              lines.push(`${n}`);
               lines.push(`${begin} --> ${end}`);
               lines.push(`${escapeFormatting(text)}`);
               lines.push(``);
