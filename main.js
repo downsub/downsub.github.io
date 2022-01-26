@@ -85,12 +85,15 @@ import {parseTtml} from './subs.js';
     const cues = parseTtml(ttml);
     const captions = document.querySelector('#captions');
     captions.innerText = '';
+    let lastBeginMs = 0;
     let lastEndMs = 0;
+    let lastText;
     for (const cue of cues) {
       const span = document.createElement('span');
-      span.innerText = (cue.text + ' ').replace(/\s+/g, ' ');
+      let text = (cue.text + ' ').replace(/\s+/g, ' ');
       const beginMs = Date.parse(`1970-01-01T${cue.begin}Z`);
       const endMs = Date.parse(`1970-01-01T${cue.end}Z`);
+      if (beginMs == lastBeginMs && endMs == lastEndMs && text == lastText) continue;
       if (lastEndMs) {
         if (beginMs - lastEndMs > 1000) {
           captions.appendChild(document.createElement('br'));
@@ -102,10 +105,13 @@ import {parseTtml} from './subs.js';
           captions.appendChild(document.createElement('br'));
         }
       }
+      span.innerText = text;
       span.dataset.beginMs = beginMs;
       span.dataset.endMs = endMs;
       captions.appendChild(span);
+      lastText = text;
       lastEndMs = endMs;
+      lastBeginMs = beginMs;
     }
   };
 
@@ -163,7 +169,6 @@ import {parseTtml} from './subs.js';
     viewCaptions();
   });
   document.querySelector('form').addEventListener('submit', (e) => {
-    console.log(e);
     if (e.submitter.value == 'Check') {
       listCaptions();
       // TODO: show captions below as well
