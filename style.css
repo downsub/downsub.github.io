@@ -1,0 +1,326 @@
+/* main layout */
+html {
+  overflow-y: scroll;
+}
+body {
+  height: 100%;
+  margin: 0;
+}
+controls,
+form {
+  display: grid;
+  place-items: center;
+}
+main {
+  min-height: 100%;
+}
+
+
+/* style reset */
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 18pt;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+input {
+  /* Arial's wider, it looks nicer */
+  font-family: Arial;
+}
+form {
+  font-size: 30pt;
+  margin: 0;
+}
+
+/* state */
+body.state-loading {
+  opacity: 0;
+}
+body.state-langs-loaded .state-start-only,
+body.state-start .state-langs-loaded-only {
+  opacity: 0;
+}
+body controls {
+  transition: background-color 0.4s ease;
+}
+body.state-start controls {
+  background-color: #eee;
+}
+body.state-langs-loaded controls {
+  background-color: #aea;
+  box-shadow: 0px 1px 6px rgb(30 30 30 / 30%);
+}
+body.state-langs-loaded {
+  background-color: #f8f8f8;
+}
+
+/* styles */
+body {
+  background-color: #eee;
+}
+
+
+controls {
+  color: #555;
+  cursor: default;
+  letter-spacing: 0.01em;
+}
+controls input {
+  font-size: 18pt;
+  padding: 1ex 0.5em;
+  margin: 0;
+  border-radius: 15px;
+  border-width: 1px;
+  border-color: #ccc;
+  border-style: solid;
+  color: #555;
+}
+
+
+controls input[type="text"]:focus,
+controls input[type="text"]:hover,
+controls input[type="submit"]:focus,
+controls input[type="submit"]:hover,
+controls button:focus,
+controls button:hover {
+  outline: none;
+  border-color: #bbb;
+  box-shadow: 0px 1px 6px rgb(30 30 30 / 30%);
+}
+
+controls input[type="text"] {
+  padding: 1ex 0.75em;
+}
+controls input[type="text"]::placeholder {
+  color: #ddd;
+}
+/* FIXME: this no longer works, build a manual dropdown instead */
+controls input[type="text"]:-webkit-autofill::first-line {
+  font-size: 18pt !important;
+}
+
+
+controls input[type="submit"] {
+  background-color: #7cf;
+  border-color: #88c;
+  color: #448;
+  padding: 1ex 1.25em;
+}
+controls input[type="submit"]:focus,
+controls input[type="submit"]:hover {
+  border-color: #669;
+}
+controls input[type="submit"]:focus {
+  background-color: #6be;
+}
+controls input[type="submit"]:active:focus {
+  background-color: #60b3e4;
+}
+
+
+controls buttongroup {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 18pt;
+  border-radius: 15px;
+}
+/* FIXME: the buttongroup can't get focus */
+controls buttongroup:hover {
+  box-shadow: 0px 1px 6px rgb(30 30 30 / 30%);
+}
+controls buttongroup label {
+  padding: 1ex 0.5em;
+  color: #888;
+  background-color: #fff;
+}
+controls buttongroup input {
+  /* To keep tabstop */
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+controls buttongroup input + label {
+  border: 1px solid;
+  border-top-color: #ccc;
+  border-bottom-color: #ccc;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  user-select: none;
+}
+controls buttongroup input:first-child + label {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-left: 1px solid #ccc;
+  padding-left: 0.75em;
+}
+controls buttongroup input + label:last-child {
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-right: 1px solid #ccc;
+  padding-right: 0.75em;
+}
+controls buttongroup input:checked + label {
+  background-color: #aaa;
+  color: #fff;
+}
+controls buttongroup input:focus + label {
+  border-color: #777;
+  border-left: 1px solid #888; /* we can't focus the buttongroup so show something subtle */
+  background-color: #999; /* we can't focus the buttongroup so show something subtle */
+  margin-left: -1;
+}
+controls buttongroup input:focus:first-child + label {
+  margin-left: 0;
+}
+controls buttongroup input:focus + label + input + label {
+  border-left: 1px solid #888; /* we can't focus the buttongroup so show something subtle */
+  margin-left: -1
+}
+controls buttongroup:hover input + label {
+  border-top-color: #aaa !important;
+  border-bottom-color: #aaa !important;
+}
+controls buttongroup:hover input:first-child + label {
+  border-left-color: #aaa !important;
+}
+controls buttongroup:hover input + label:last-child {
+  border-right-color: #aaa !important;
+}
+
+
+controls dropdown {
+  position: relative;
+}
+controls dropdown > input {
+  display: none;
+}
+controls dropdown > label {
+  font-size: 18pt;
+  border-radius: 15px;
+  border-width: 1px;
+  border-color: #ccc;
+  border-style: solid;
+  background-color: #fff;
+  color: #444;
+  padding: 1ex 1em;
+  display: inline-block;
+  user-select: none;
+}
+controls dropdown > datalist {
+  font-size: 18pt;
+  border-radius: 15px;
+  border-width: 1px;
+  border-color: #ccc;
+  border-style: solid;
+  background: #fff;
+  position: absolute;
+  left: 0;
+  margin-top: -1px;
+  border-top-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  color: #777;
+  z-index: 1;
+}
+controls dropdown#lang > label {
+  width: 16em;
+}
+controls dropdown#lang > label + datalist {
+  width: calc(16em + 1em + 1em);
+  height: 16ex;
+}
+controls dropdown > label:hover,
+controls dropdown > input:checked + label,
+controls dropdown > label:focus,
+controls dropdown > datalist {
+  box-shadow: 0px 1px 6px rgb(30 30 30 / 30%);
+  outline: none;
+}
+controls dropdown > input:checked + label {
+  border-bottom-style: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+controls dropdown > input:checked + label + datalist {
+  display: block;
+  overflow-y: scroll;
+}
+controls dropdownoption > input {
+  display: none;
+}
+controls dropdownoption > input + label {
+  display: block;
+  padding: 0.8ex 1.25em;
+}
+controls dropdownoption > input + label:hover,
+controls dropdownoption > input:checked + label {
+  background-color: #ddd;
+}
+
+
+controls > form {
+  padding: 0.5ex 0;
+}
+controls > form > div {
+  padding: 0.5ex 0;
+}
+
+
+.player.player-not-ready iframe {
+  display: none;
+}
+.player {
+  width: 400px;
+  display: grid;
+  place-items: center;
+  /* position: sticky;
+  top: 0; */
+  margin: 2ex auto;
+}
+.player iframe {
+  /* This is to overlay with the thumbnail */
+  grid-area: 1 / 1 / 1 / 1;
+}
+.player #thumbnail {
+  width: 400px;
+  height: 225px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* 4:3 thumbnails will be cropped */
+  background-position: center;
+  opacity: 1;
+  pointer-events: none;
+  grid-area: 1 / 1 / 1 / 1;
+  transition: opacity 0.5s ease;
+  z-index: 0;
+}
+.player.player-ready:hover #thumbnail,
+.player.player-ready.player-playing #thumbnail {
+  opacity: 0;
+}
+.player.player-ready .controls {
+  opacity: 0;
+}
+
+
+.captions {
+  font-size: 16pt;
+  line-height: 1.5;
+  margin: 0 auto;
+  width: 25em;
+}
+
+
+footer {
+  font-size: 16pt;
+  color: #888;
+}
+footer .report-bug {
+  margin-right: 1em;
+  padding-bottom: 2ex;
+  text-align: right;
+}
+
