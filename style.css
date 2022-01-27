@@ -34,6 +34,7 @@ form {
   margin: 0;
 }
 
+
 /* state */
 body.state-loading {
   opacity: 0;
@@ -306,6 +307,11 @@ controls > form > div {
 }
 
 
+h3 {
+  font-size: 20pt;
+  text-align: center;
+  padding: 1ex 0 2ex 0;
+}
 .captions {
   font-size: 16pt;
   line-height: 1.5;

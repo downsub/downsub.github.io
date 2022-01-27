@@ -2,6 +2,7 @@ import YtPlayer from './ytplayer.js';
 import * as Yt from './yt.js'
 import Dropdown from './dropdown.js';
 import {parseTtml} from './subs.js';
+import YtApi from './ytapi.js';
 
 (() => {
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -71,12 +72,59 @@ import {parseTtml} from './subs.js';
       if (window.currentYoutubeId != id) return;
       document.querySelector('#thumbnail').style.backgroundImage = url;
     });
-    loadVideo(id);
 
-    viewCaptions();
+    loadVideo();
+    showCaptionsAndChapters();
   };
 
-  const viewCaptions = async () => {
+  const showCaptionsAndChapters = async () => {
+    await Promise.all([loadSnippet(), showCaptions()]);
+    showChapters();
+  };
+
+  const loadSnippet = async () => {
+    const id = window.currentYoutubeId;
+    const lang = document.querySelector('#lang');
+    const languageCode = lang.dataset.languageCode;
+    const snippet = await YtApi.getVideoSnippet(id, languageCode);
+    const tags = snippet.tags;
+    const {title, description} = snippet.localized;
+    document.querySelector('#title').innerText = title;
+    const chapters = [];
+    for (const line of description.split('\n')) {
+      const match = /^((?<h>\d?\d):)?(?<m>\d?\d):(?<s>\d\d)\s(?<chapter>.*)/.exec(line);
+      if (match) {
+        const {h, m, s, chapter} = match.groups;
+        const ms = (((Number(h) || 0) * 60 + Number(m)) * 60 + Number(s)) * 1000;
+        chapters.push([ms, chapter.trim()]);
+      }
+    }
+    window.chapters = chapters;
+  };
+
+  const showChapters = async () => {
+    for (const [ms, chapter] of chapters) {
+      const a = document.createElement('a');
+      a.href = `#${ms}`;
+      a.innerText = chapter;
+      const h = document.createElement('h4');
+      h.id = ms;
+      h.appendChild(a);
+      const captions = document.querySelector('#captions');
+      // TODO: use an iterator
+      // TODO: delete preceding <br>s
+      for (const span of captions.querySelectorAll(':scope > span')) {
+        const beginMs = Number(span.dataset.beginMs);
+        const endMs = Number(span.dataset.endMs);
+        if (beginMs >= ms) {
+          captions.insertBefore(h, span);
+          break
+        }
+      }
+    }
+  }
+
+  const showCaptions = async () => {
     const lang = document.querySelector('#lang');
     const baseUrl = lang.dataset.baseUrl;
     const languageCode = lang.dataset.languageCode;
@@ -140,7 +188,9 @@ import {parseTtml} from './subs.js';
     a.click();
   };
 
-  const loadVideo = async (id) => {
+  const loadVideo = async () => {
+    const id = window.currentYoutubeId;
+
     document.querySelector('.player').classList.remove('player-ready');
     document.querySelector('.player').classList.add('player-not-ready');
 
@@ -166,7 +216,7 @@ import {parseTtml} from './subs.js';
   });
   document.querySelector('#lang').addEventListener('change', ({target}) => {
     setUrlParams({lang: document.querySelector('#lang').dataset.languageCode});
-    viewCaptions();
+    showCaptionsAndChapters();
   });
   document.querySelector('form').addEventListener('submit', (e) => {
     if (e.submitter.value == 'Check') {
@@ -210,5 +260,7 @@ import {parseTtml} from './subs.js';
   document.querySelector('input[name="url"]').focus();
 
   window.langDropdown = new Dropdown('lang');
+
+  YtApi.init();
 
 })();
