@@ -44,26 +44,23 @@ import YtApi from './ytapi.js';
     const captionInfo = await Yt.getCaptionList(id);
     if (!captionInfo) error(`Could not find any captions for this video`);
 
-    const languageCode = searchParams.get('lang');
-    let langIndex;
+    const vssId = searchParams.get('vss');
+    let qsIndex;
+    let englishIndex;
 
-    const defaultTrack = captionInfo?.audioTracks?.[0]?.defaultCaptionTrackIndex;
+    const defaultIndex = captionInfo?.audioTracks?.[0]?.defaultCaptionTrackIndex;
     const options = [];
     for (const [index, track] of captionInfo.captionTracks.entries()) {
       options.push([index, track.name?.simpleText, {
+        vssId: track.vssId,
         languageCode: track.languageCode,
         baseUrl: track.baseUrl,
       }]);
-      if (track.languageCode == languageCode) langIndex = index;
+      if (track.vssId == vssId) qsIndex = index;
+      if (track.languageCode == 'en') englishIndex = index;
     }
     langDropdown.setOptions(options);
-    langDropdown.index = defaultTrack;
-
-    // FIXME: put this in localStorage
-    if (langIndex == null) langIndex = defaultTrack;
-    // FIXME: try English
-    if (langIndex == null) langIndex = 0;
-    // FIXME: store and use track as a hint in case there are multiple of the same language
+    langDropdown.index = qsIndex ?? defaultIndex ?? englishIndex ?? 0;
 
     setState('state-langs-loaded');
     window.currentYoutubeId = id;
@@ -127,7 +124,6 @@ import YtApi from './ytapi.js';
   const showCaptions = async () => {
     const lang = document.querySelector('#lang');
     const baseUrl = lang.dataset.baseUrl;
-    const languageCode = lang.dataset.languageCode;
 
     const ttml = await Yt.getCaptionsInFormat(baseUrl, 'ttml');
     const cues = parseTtml(ttml);
@@ -166,7 +162,7 @@ import YtApi from './ytapi.js';
   const downloadCaptions = async () => {
     const lang = document.querySelector('#lang');
     const baseUrl = lang.dataset.baseUrl;
-    const languageCode = lang.dataset.languageCode;
+    const vssId = lang.dataset.vssId;
     const name = lang.querySelector(':scope > label').innerText;
     const format = document.querySelector('input[name="format"]:checked').value;
     const id = window.currentYoutubeId;
@@ -183,7 +179,7 @@ import YtApi from './ytapi.js';
     if (name) {
       a.download = `${title}.${name}.${format}`;
     } else {
-      a.download = `${title}.${languageCode}.${format}`;
+      a.download = `${title}.${vssId}.${format}`;
     }
     a.click();
   };
@@ -215,7 +211,7 @@ import YtApi from './ytapi.js';
     setUrlParams({format});
   });
   document.querySelector('#lang').addEventListener('change', ({target}) => {
-    setUrlParams({lang: document.querySelector('#lang').dataset.languageCode});
+    setUrlParams({vss: document.querySelector('#lang').dataset.vssId});
     showCaptionsAndChapters();
   });
   document.querySelector('form').addEventListener('submit', (e) => {
@@ -245,6 +241,7 @@ import YtApi from './ytapi.js';
 
   const searchParams = new URL(document.location).searchParams;
 
+  // FIXME: put this in localStorage
   let format = searchParams.get('format');
   if (!format) format = 'srt';
   if (!format.match(/^[a-z0-9]+$/)) format = 'srt';
