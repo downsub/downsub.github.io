@@ -19,6 +19,7 @@ import YtApi from './ytapi.js';
     for (const k in params) {
       searchParams.set(k, params[k]);
     }
+    if (new URL(document.location).searchParams.toString() == searchParams.toString()) return;
     history.pushState({}, '', '?' + searchParams);
   };
 
