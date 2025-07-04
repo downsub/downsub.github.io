@@ -3,7 +3,7 @@ import {ttmlToSrt, ttmlToText} from './subs.js';
 export const getVideoId = (url) => {
   const res = [
     new RegExp('^(https?://)?youtu\\.be/(?<id>[A-Za-z0-9_-]+)'),
-    new RegExp('^(https?://)?(www\\.|m.)?(youtube|googlevideo|youtube-nocookie)\\.com/(embed/|v/|.*\\?v=|.*\\&v=)(?<id>[A-Za-z0-9_-]+)'),
+    new RegExp('^(https?://)?(www\\.|m.)?(youtube|googlevideo|youtube-nocookie)\\.com/(embed/|short/|v/|.*\\?v=|.*\\&v=)(?<id>[A-Za-z0-9_-]+)'),
   ];
   for (const re of res) {
     const match = url.match(re);
