@@ -24,10 +24,14 @@ import YtApi from './ytapi.js';
   };
 
   const error = (msg) => {
-      langDropdown.clearOptions();
-      setState('state-start');
-      setTimeout(() => alert(msg), 200);
-      throw msg;
+    langDropdown.clearOptions();
+    setState('state-start');
+    document.querySelector('error').innerText = msg;
+    throw msg;
+  };
+
+  const clearError = () => {
+    document.querySelector('error').innerText = '';
   };
 
   const listCaptions = async () => {
@@ -42,7 +46,11 @@ import YtApi from './ytapi.js';
     const id = Yt.getVideoId(url);
     if (!id) error(`Could not recognise this as a YouTube URL`);
     setUrlParams({url});
-    const captionInfo = await Yt.getCaptionList(id);
+    try {
+      const captionInfo = await Yt.getCaptionList(id);
+    } catch (e) {
+      error(e);
+    }
     if (!captionInfo) error(`Could not find any captions for this video`);
 
     const vssId = searchParams.get('vss');
@@ -206,16 +214,19 @@ import YtApi from './ytapi.js';
   };
 
   document.querySelector('#format').addEventListener('click', ({target}) => {
+    clearError();
     if (!target.matches('input[name="format"]')) return;
     const format = document.querySelector('input[name="format"]:checked').value;
     // FIXME: store this in localstorage instead
     setUrlParams({format});
   });
   document.querySelector('#lang').addEventListener('change', ({target}) => {
+    clearError();
     setUrlParams({vss: document.querySelector('#lang').dataset.vssId});
     showCaptionsAndChapters();
   });
   document.querySelector('form').addEventListener('submit', (e) => {
+    clearError();
     if (e.submitter.value == 'Check') {
       listCaptions();
       // TODO: show captions below as well

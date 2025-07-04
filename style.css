@@ -273,6 +273,22 @@ controls > form > div {
 }
 
 
+error {
+  background-color: #fcc;
+  display: block;
+  text-align: center;
+  width: 50%;
+  padding: 1ex 1em;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 15px;
+  border: 1px solid #e88;
+}
+
+error:empty {
+  display: none;
+}
+
 .player.player-not-ready iframe {
   display: none;
 }

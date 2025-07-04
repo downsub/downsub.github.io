@@ -27,7 +27,11 @@ export const getCaptionList = async (id) => {
   const url = `https://europe-west2-youtube-transcript-api-339100.cloudfunctions.net/youtube_transcript_api?video_id=${id}`
 //  const url = `captionlist-${id}.json`;
   const resp = await fetch(url);
-  return await resp.json();
+  const json = await resp.json();
+  if (json.error) {
+    throw json.cause;
+  }
+  return json;
 };
 
 const getCaptions = async (baseUrl, format) => {
